@@ -2,14 +2,12 @@
 pragma solidity >=0.5.0 < 0.9.0;
 
 contract Election{ 
-
-    struct Candidate{ 
+    struct Candidate{
         string name; 
         uint numVotes; 
-
     }
 
-    struct Voter{ 
+    struct Voter{
         string name; 
         bool authorised; 
         uint whom;
@@ -19,46 +17,53 @@ contract Election{
     address public owner; 
     string public electionName; 
 
+
     mapping(address => Voter) public voters; 
     Candidate[] public candidates; 
     uint public totalVotes; 
 
-    
+
     modifier ownerOnly(){ 
         require(msg.sender == owner); 
-        _; 
+        _;
     }
 
-    function startElection(string memory _name) public{ 
+    function startElection(string memory _electionName) public{ 
         owner = msg.sender; 
-        electionName = _name; 
-
+        electionName = _electionName; 
     }
 
-    function addCandidate(string memory _name) ownerOnly public{ 
-        candidates.push(Candidate(_name, 0)); 
-        
-    }
-
-    function getNumCandidates() public view returns(uint){
-        return candidates.length; 
+    function addCandidate(string memory _candidateName )ownerOnly public{ 
+        candidates.push(Candidate(_candidateName, 0));
     }
 
     function authorizeVoter(address _voterAddress) ownerOnly public{ 
-        voters[_voterAddress].authorised = true; 
+        voters[_voterAddress].authorised= true; 
     }
 
-    function vote(uint candidateIndex)public{ 
+    function getNumCandidates() public view returns(uint){ 
+        return candidates.length; 
+    }
+
+    function vote(uint candidateIndex) public{ 
         require(!voters[msg.sender].voted); 
-        require(voters[msg.sender].authorised);
+        require(voters[msg.sender].authorised); 
         voters[msg.sender].whom = candidateIndex; 
-        voters[msg.sender].voted = true;
+        voters[msg.sender].voted = true; 
 
         candidates[candidateIndex].numVotes++; 
-        totalVotes++; 
+        totalVotes++;
     }
 
-    // function end() ownerOnly public{ 
-    //     selfdestruct(owner); 
-    // }
+
+    function getTotalVotes()public view returns(uint) {
+        return totalVotes;
+    }
+
+function candidateInfo(uint index) public view returns(Candidate memory){ 
+        return candidates[index];
+    }
+
+
+
 }
